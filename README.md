@@ -1,2 +1,6 @@
 # paysan
-A web server implemented in lisette because why not
+
+```bash
+lis build
+go run -C target .
+```
