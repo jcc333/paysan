@@ -1,8 +1,20 @@
 # paysan
 
+## Who?
+
+Me, jcc333!
+
 ## What?
 
 A webserver in lisette. Nothing fancy.
+
+## When?
+
+Mostly mornings before 7:30 to be honest.
+
+## Where?
+
+Internet.
 
 ## Why?
 
@@ -14,17 +26,34 @@ It would be nice to play with a new programming language that is:
 
 ## How?
 
-...do you build?
+*How what?*
+
+### How Think?
+
+- Spawn a task per request
+- Middleware layers
+- Filters like [Warp](https://docs.rs/warp/latest/warp/) I guess
+
+### How Build?
 
 ```bash
 lis build
+```
+
+### How Run?
+
+```bash
+lis run
+```
+
+*or*
+
+```
 go run -C target .
 ```
 
-## Who?
+### How Test?
 
-Me, jcc333!
-
-## When?
-
-Mostly mornings before 7:30 to be honest.
+```bash
+lis test
+```

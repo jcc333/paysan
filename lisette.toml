@@ -1,3 +1,6 @@
 [project]
 name = "paysan"
 version = "0.1.0"
+
+[dependencies.go]
+"github.com/julienschmidt/httprouter" = "v1.3.0"
