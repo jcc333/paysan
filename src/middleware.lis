@@ -1,0 +1,41 @@
+import "go:net/http"
+
+interface Middleware<A: http.Request, B: http.Request> {
+  fn apply(req: A) -> Result<B, error>
+}
+
+fn chain<A: http.Request, B: http.Request, C: http.Request>(m1: Middleware<A, B>, m2: Middleware<B, C>) -> Middleware<A, C> {
+  struct ChainedMiddleware {
+    m1: Middleware<A, B>,
+    m2: Middleware<B, C>,
+  }
+
+  impl ChainedMiddleware {
+    fn apply(self, req: A) -> Result<C, error> {
+      let intermediate = self.m1.apply(req)?
+      self.m2.apply(intermediate)
+    }
+  }
+
+  ChainedMiddleware { m1, m2 }
+}
+
+fn then<A: http.Request, B: http.Request, C: http.Request>(m1: Middleware<A, B>, m2: Middleware<B, C>) -> Middleware<A, C> {
+  chain(m1, m2)
+}
+
+fn around<A: http.Request, B: http.Request, C: http.Request>(before: Middleware<A, B>, after: Middleware<B, C>) -> Middleware<A, C> {
+  struct AroundMiddleware {
+    before: Middleware<A, B>,
+    after: Middleware<B, C>,
+  }
+
+  impl AroundMiddleware {
+    fn apply(self, req: A) -> Result<C, error> {
+      let intermediate = self.before.apply(req)?
+      self.after.apply(intermediate)
+    }
+  }
+
+  AroundMiddleware { before, after }
+}
