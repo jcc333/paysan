@@ -1,0 +1,67 @@
+interface Filter {
+  fn matches(req: Request) -> bool
+}
+
+struct PathFilter {
+  path: string,
+}
+
+impl PathFilter {
+  fn matches(self, req: Request) -> bool {
+    req.path_params.get("path") == Some(self.path)
+  }
+}
+
+struct MethodFilter {
+  method: string,
+}
+
+impl MethodFilter {
+  fn matches(self, req: Request) -> bool {
+    req.method == self.method
+  }
+}
+
+fn and(f1: Filter, f2: Filter) -> Filter {
+  struct AndFilter {
+    f1: Filter,
+    f2: Filter,
+  }
+
+  impl AndFilter {
+    fn matches(self, req: Request) -> bool {
+      self.f1.matches(req) && self.f2.matches(req)
+    }
+  }
+
+  AndFilter { f1, f2 }
+}
+
+fn or(f1: Filter, f2: Filter) -> Filter {
+  struct OrFilter {
+    f1: Filter,
+    f2: Filter,
+  }
+
+  impl OrFilter {
+    fn matches(self, req: Request) -> bool {
+      self.f1.matches(req) || self.f2.matches(req)
+    }
+  }
+
+  OrFilter { f1, f2 }
+}
+
+fn not(f: Filter) -> Filter {
+  struct NotFilter {
+    f: Filter,
+  }
+
+  impl NotFilter {
+    fn matches(self, req: Request) -> bool {
+      !self.f.matches(req)
+    }
+  }
+
+  NotFilter { f }
+}
