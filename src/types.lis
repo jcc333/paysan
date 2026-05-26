@@ -1,0 +1,35 @@
+struct Request {
+  path_params: Map<string, string>,
+  headers: Map<string, string>,
+  body: Option<string>,
+  method: string,
+
+  fn getRequest(self) -> http.Request {
+    let req = http.Request {
+      Method: self.method,
+      Header: self.headers,
+      Body: self.body.map(|b| io.NopCloser(strings.NewReader(b))),
+      ..
+    }
+    for (key, value) in self.path_params {
+      req.URL.Query().Set(key, value)
+    }
+    req
+  }
+}
+
+struct Response {
+  status_code: int,
+  headers: Map<string, string>,
+  body: Option<string>,
+
+  fn getResponse(self) -> http.Response {
+    let resp = http.Response {
+      StatusCode: self.status_code,
+      Header: self.headers,
+      Body: self.body.map(|b| io.NopCloser(strings.NewReader(b))),
+      ..
+    }
+    resp
+  }
+}
