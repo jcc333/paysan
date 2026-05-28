@@ -1,5 +1,8 @@
+import "go:net/http"
+import "types"
+
 interface Filter {
-  fn matches(req: Request) -> bool
+  fn matches(req: RequestWrapper) -> bool
 }
 
 struct PathFilter {
@@ -7,61 +10,65 @@ struct PathFilter {
 }
 
 impl PathFilter {
-  fn matches(self, req: Request) -> bool {
-    req.path_params.get("path") == Some(self.path)
+  fn matches(self, req: RequestWrapper) -> bool {
+    req.path() == Some(self.path)
   }
 }
 
+fn path(p: string) {
+  PathFilter { path: p }
+}
+
 struct MethodFilter {
-  method: string,
+  method: Method,
 }
 
 impl MethodFilter {
-  fn matches(self, req: Request) -> bool {
-    req.method == self.method
+  fn matches(self, req: RequestWrapper) -> bool {
+    Method.read(req.method()) == Some(self.method)
+  }
+}
+
+struct AndFilter {
+  f1: Filter,
+  f2: Filter,
+}
+
+impl AndFilter {
+  fn matches(self, req: RequestWrapper) -> bool {
+    self.f1.matches(req) && self.f2.matches(req)
   }
 }
 
 fn and(f1: Filter, f2: Filter) -> Filter {
-  struct AndFilter {
-    f1: Filter,
-    f2: Filter,
-  }
-
-  impl AndFilter {
-    fn matches(self, req: Request) -> bool {
-      self.f1.matches(req) && self.f2.matches(req)
-    }
-  }
-
   AndFilter { f1, f2 }
 }
 
+struct OrFilter {
+  f1: Filter,
+  f2: Filter,
+}
+
+impl OrFilter {
+  fn matches(self, req: RequestWrapper) -> bool {
+    self.f1.matches(req) || self.f2.matches(req)
+  }
+}
+
 fn or(f1: Filter, f2: Filter) -> Filter {
-  struct OrFilter {
-    f1: Filter,
-    f2: Filter,
-  }
-
-  impl OrFilter {
-    fn matches(self, req: Request) -> bool {
-      self.f1.matches(req) || self.f2.matches(req)
-    }
-  }
-
   OrFilter { f1, f2 }
 }
 
+struct NotFilter {
+  f: Filter,
+}
+
+impl NotFilter {
+  fn matches(self, req: RequestWrapper) -> bool {
+    !self.f.matches(req)
+  }
+}
+
 fn not(f: Filter) -> Filter {
-  struct NotFilter {
-    f: Filter,
-  }
-
-  impl NotFilter {
-    fn matches(self, req: Request) -> bool {
-      !self.f.matches(req)
-    }
-  }
-
   NotFilter { f }
 }

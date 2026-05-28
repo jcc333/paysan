@@ -5,20 +5,6 @@ import "go:net/http"
 // routing requests to their proper handlers.
 struct Router {}
 
-// A `Filter` is for determining if a request is in scope for a Router.
-// e.g. "is this request being made to this path?"
-interface Filter<A: http.Request> {
-  fn apply(self, req: A) -> Option<A>
-}
-
-struct funcFilter<A: http.Request> { f: fn(A) -> Option<A> }
-
-impl<A: http.Request> funcFilter<A> {
-  fn apply(self, a: A) -> Option<A> {
-    self.f(a)
-  }
-}
-
 // A `Middleware` is for doing *things* to *requests.*
 // e.g. turning a raw `http.Request` into an `AuthorizedRequest`
 type Middleware<A: http.Request, B: http.Request> = fn(A) -> Result<B, error>
@@ -26,4 +12,6 @@ type Middleware<A: http.Request, B: http.Request> = fn(A) -> Result<B, error>
 // a `Responder` uh, responds.
 type Responder<Req: http.Request, Resp: http.Response> = fn(Req) -> Result<Resp, error>
 
-fn main() {}
+fn main() {
+  fmt.Println("Hello paysan")
+}

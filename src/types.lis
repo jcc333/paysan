@@ -1,35 +1,48 @@
-struct Request {
-  path_params: Map<string, string>,
-  headers: Map<string, string>,
-  body: Option<string>,
-  method: string,
+import "go:net/http"
 
-  fn getRequest(self) -> http.Request {
-    let req = http.Request {
-      Method: self.method,
-      Header: self.headers,
-      Body: self.body.map(|b| io.NopCloser(strings.NewReader(b))),
-      ..
-    }
-    for (key, value) in self.path_params {
-      req.URL.Query().Set(key, value)
-    }
-    req
-  }
+interface RequestWrapper {
+  fn request(self) -> Ref<http.Request>
 }
 
-struct Response {
-  status_code: int,
-  headers: Map<string, string>,
-  body: Option<string>,
+enum Method {
+  CONNECT,
+  DELETE,
+  GET,
+  HEAD,
+  OPTIONS,
+  PATCH,
+  POST,
+  PUT,
+  TRACE,
+}
 
-  fn getResponse(self) -> http.Response {
-    let resp = http.Response {
-      StatusCode: self.status_code,
-      Header: self.headers,
-      Body: self.body.map(|b| io.NopCloser(strings.NewReader(b))),
-      ..
+impl Method {
+  fn show(self) -> string {
+    match self {
+      Method.CONNECT => "CONNECT",
+      Method.DELETE => "DELETE",
+      Method.GET => "GET",
+      Method.HEAD => "HEAD",
+      Method.OPTIONS => "OPTIONS",
+      Method.PATCH => "PATCH",
+      Method.POST => "POST",
+      Method.PUT => "PUT",
+      Method.TRACE => "TRACE",
     }
-    resp
+  }
+
+  fn read(m: string) -> Option<Method> {
+    match m {
+      "CONNECT" => Some(Method.CONNECT),
+      "DELETE" => Some(Method.DELETE),
+      "GET" => Some(Method.GET),
+      "HEAD" => Some(Method.HEAD),
+      "OPTIONS" => Some(Method.OPTIONS),
+      "PATCH" => Some(Method.PATCH),
+      "POST" => Some(Method.POST),
+      "PUT" => Some(Method.PUT),
+      "TRACE" => Some(Method.TRACE),
+      _ => None,
+    }
   }
 }
