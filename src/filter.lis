@@ -1,5 +1,4 @@
 import "go:net/http"
-import "types"
 
 interface Filter {
   fn matches(req: RequestWrapper) -> bool
@@ -15,7 +14,7 @@ impl PathFilter {
   }
 }
 
-fn path(p: string) {
+fn path(p: string) -> Filter {
   PathFilter { path: p }
 }
 
@@ -25,7 +24,7 @@ struct MethodFilter {
 
 impl MethodFilter {
   fn matches(self, req: RequestWrapper) -> bool {
-    Method.read(req.method()) == Some(self.method)
+    req.method().and_then(Method.read) == Some(self.method)
   }
 }
 

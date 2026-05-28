@@ -9,7 +9,7 @@ struct ChainedMiddleware<A: http.Request, B: http.Request, C: http.Request> {
   m2: Middleware<B, C>,
 }
 
-impl ChainedMiddleware<A, B, C> {
+impl<A: http.Request, B: http.Request, C: http.Request> ChainedMiddleware<A, B, C> {
   fn apply(self, req: A) -> Result<C, error> {
     let intermediate = self.m1.apply(req)?
     self.m2.apply(intermediate)
@@ -29,7 +29,7 @@ struct AroundMiddleware<A: http.Request, B: http.Request, C: http.Request> {
   after: Middleware<B, C>,
 }
 
-impl AroundMiddleware<A, B, C> {
+impl<A: http.Request, B: http.Request, C: http.Request> AroundMiddleware<A, B, C> {
   fn apply(self, req: A) -> Result<C, error> {
     let intermediate = self.before.apply(req)?
     self.after.apply(intermediate)
