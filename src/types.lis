@@ -2,6 +2,8 @@ import "go:net/http"
 
 interface RequestWrapper {
   fn request(self) -> Ref<http.Request>
+  fn path(self) -> Option<string>
+  fn method(self) -> Option<string>
 }
 
 enum Method {
